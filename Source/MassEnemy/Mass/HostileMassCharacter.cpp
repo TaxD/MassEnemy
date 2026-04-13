@@ -5,7 +5,10 @@
 
 #include "HostileMassFragments.h"
 #include "MassAgentSubsystem.h"
+#include "MassCommonFragments.h"
 #include "MassEntitySubsystem.h"
+#include "NavigationSystem.h"
+#include "Components/CapsuleComponent.h"
 
 AHostileMassCharacter::AHostileMassCharacter()
 {
@@ -64,6 +67,17 @@ void AHostileMassCharacter::OnEntityAssociated(const UMassAgentComponent& AgentC
 
 	SyncMassToActor();
 	OnMassActorActivated();
+
+	if (auto* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
+	{
+		FNavLocation NavLocation;
+		if (NavSystem->ProjectPointToNavigation(GetActorLocation(), NavLocation, FVector(0.f, 0.f, 500.f)))
+		{
+			FVector CurrentLocation = GetActorLocation();
+			CurrentLocation.Z = NavLocation.Location.Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+			SetActorLocation(CurrentLocation);
+		}
+	}
 }
 
 void AHostileMassCharacter::OnEntityDetaching(const UMassAgentComponent& AgentComponent)
