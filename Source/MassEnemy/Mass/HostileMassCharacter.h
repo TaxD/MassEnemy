@@ -19,6 +19,7 @@ public:
 	void KillHostile(float TTL);
 
 protected:
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintImplementableEvent)

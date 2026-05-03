@@ -13,6 +13,8 @@
 AHostileMassCharacter::AHostileMassCharacter()
 {
 	MassAgent = CreateDefaultSubobject<UMassAgentComponent>(TEXT("MassAgent"));
+	MassAgent->bAutoRegister = false;
+	MassAgent->SetIsReplicated(false);
 }
 
 void AHostileMassCharacter::KillHostile(float TTL)
@@ -30,11 +32,18 @@ void AHostileMassCharacter::KillHostile(float TTL)
 	);
 }
 
+void AHostileMassCharacter::PostInitializeComponents()
+{
+	if (HasAuthority() && MassAgent) MassAgent->Enable();
+
+	Super::PostInitializeComponents();
+}
+
 void AHostileMassCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (MassAgent)
+	if (HasAuthority() && MassAgent)
 	{
 		if (auto MassAgentSubsystem = GetWorld()->GetSubsystem<UMassAgentSubsystem>())
 		{
